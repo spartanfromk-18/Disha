@@ -273,3 +273,5 @@ Yes — every line was dictated through Wispr Flow; no code was typed by hand. T
 ## 📄 Docs
 
 Full spec pack (v1.0, conformance-verified): [`docs/PRD.md`](docs/PRD.md) · [`docs/TRD.md`](docs/TRD.md) · [`docs/UI_UX.md`](docs/UI_UX.md) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+
+If you want docs of this repo then mail at y90703373@gmail.com
