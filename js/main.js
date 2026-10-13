@@ -2,7 +2,8 @@
 import { el, setLang, refreshLabels } from './ui.js';
 import { settings } from './store.js';
 import { tr } from './i18n.js';
-import { speak, toggleListen, stopListen, onSpeechResult, speechSupported } from './speech.js';
+import { speak } from './speech.js';
+import { toggleListen, stopListen, onSpeechResult, speechSupported } from './speech.js';
 import { onHeard } from './commands.js';
 
 el.talkBtn.addEventListener('click', toggleListen);

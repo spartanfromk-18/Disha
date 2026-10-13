@@ -114,7 +114,8 @@ Switches speech recognition, voice responses, and templates to Hindi. *"मै�
 ```mermaid
 flowchart LR
     A["🎙️ Voice / Tap"] --> B["commands.js<br/>intent parser"]
-    B --> C["speech.js<br/>STT + TTS"]
+    B --> C["transcription.js<br/>Web Speech / Wispr"]
+    C --> D2["speech.js<br/>TTS"]
     B --> D["geo.js<br/>GPS + geocode"]
     B --> E["places.js<br/>nearby search"]
     D --> F[("Nominatim<br/>OpenStreetMap")]
@@ -123,7 +124,7 @@ flowchart LR
     H --> I["Google Maps<br/>real routing"]
     H --> J["WhatsApp<br/>share + SOS"]
     B --> K["chime.js<br/>arrival beacon"]
-    C --> L["🔊 Spoken answer<br/>+ 48px echo"]
+    D2 --> L["🔊 Spoken answer<br/>+ 48px echo"]
 ```
 
 **The honest architecture:** Disha never routes — that's Google's job, done better than a 2-day build ever could. Disha is the *interface layer Google forgot*: eyes-free, voice-first, one job per command. Local-first, zero backend, nothing to leak.
@@ -199,7 +200,8 @@ disha/
 │   ├── i18n.js           # English + Hindi response templates
 │   ├── store.js          # localStorage: settings, favorites, breadcrumb
 │   ├── ui.js             # DOM refs, status/transcript/response rendering
-│   ├── speech.js         # voice in (recognition) + voice out (synthesis)
+│   ├── speech.js         # voice output (speech synthesis)
+│   ├── transcription.js  # Web Speech default + optional Wispr provider/fallback
 │   ├── geo.js            # geolocation + Nominatim geocoding
 │   ├── places.js         # "what's near me" via Overpass API
 │   ├── nav.js            # deep links: Google Maps + WhatsApp
@@ -219,7 +221,19 @@ disha/
 ## 🔑 Environment & API keys
 
 <details>
-<summary>The professional setup — keyless today, ready for tomorrow</summary>
+<summary><strong>Pro transcription mode</strong> — optional Wispr Flow input</summary>
+
+Web Speech recognition remains the default and needs no API key. To opt into Wispr Flow:
+
+```bash
+cp .env.example .env
+# Set WISPR_API_KEY and TRANSCRIPTION_PROVIDER=wispr
+node scripts/inject-env.js
+```
+
+You can also say **"use wispr mode"** or **"use browser mode"**. The active provider is shown in the header. Set `WISPR_MOCK=true` to test with the canned transcript **"take me home"** without recording, network access, or API cost. If the key is missing or Wispr fails, Disha speaks a notice and falls back to browser recognition.
+
+> **Key security:** a key injected into a static PWA is visible to anyone using the site's developer tools. This client-side path is suitable for local development or controlled demos only. Production should put Wispr behind a backend proxy that stores the key server-side; that proxy is out of scope for this repository.
 
 Disha runs **fully keyless** on OpenStreetMap. When you need a key later (embedded maps, weather), the plumbing is ready:
 

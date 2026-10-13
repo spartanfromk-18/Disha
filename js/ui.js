@@ -15,6 +15,7 @@ export const el = {
   langHi: $('langHi'),
   srNote: $('srNote'),
   secureWarn: $('secureWarn'),
+  providerPill: $('providerPill'),
 };
 
 export function setStatus(s) { el.status.textContent = s || ''; }
@@ -33,6 +34,8 @@ export function refreshLabels() {
   el.heardLabel.textContent = tr(settings.lang, 'heard');
   el.saidLabel.textContent = tr(settings.lang, 'says');
   document.documentElement.lang = settings.lang.slice(0, 2);
+  el.providerPill.textContent = settings.transcriptionProvider === 'wispr' ? 'WISPR' : 'BROWSER';
+  el.providerPill.setAttribute('aria-label', `Transcription provider: ${el.providerPill.textContent}`);
 }
 
 export function setLang(lang) {

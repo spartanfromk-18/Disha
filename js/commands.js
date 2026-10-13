@@ -1,9 +1,10 @@
 /* commands.js — voice intent parsing + handlers (EN + HI).
  * Every intent: show transcript -> announce "working" -> act ->
  * speak result + large-type echo (TRD FR-2). */
-import { setStatus, showHeard, setTalkState, setLang } from './ui.js';
+import { setStatus, showHeard, setTalkState, setLang, refreshLabels } from './ui.js';
 import { settings, saveSettings, db } from './store.js';
-import { speak, say, stopListen } from './speech.js';
+import { speak, say } from './speech.js';
+import { stopListen } from './transcription.js';
 import { getPos, reverseGeocode, searchPlace } from './geo.js';
 import { nearby } from './places.js';
 import { mapsDir, mapsSearch, waShare, waTo, openUrl } from './nav.js';
@@ -35,6 +36,22 @@ async function handle(raw) {
     /* language */
     if (/speak hindi|हिंदी में बोलो/.test(text)) { setLang('hi-IN'); say('langName'); return; }
     if (/speak english|अंग्रेज़ी में बोलो|अंग्रेजी में बोलो/.test(text)) { setLang('en-IN'); say('langName'); return; }
+
+    /* transcription provider */
+    if (/use wispr mode/.test(text)) {
+      settings.transcriptionProvider = 'wispr';
+      saveSettings();
+      refreshLabels();
+      say('wisprEnabled');
+      return;
+    }
+    if (/use browser mode/.test(text)) {
+      settings.transcriptionProvider = 'webspeech';
+      saveSettings();
+      refreshLabels();
+      say('browserEnabled');
+      return;
+    }
 
     /* emergency contact */
     m = text.match(/my emergency (?:number|contact) is ([\d+\s-]{6,})/);

@@ -13,9 +13,13 @@ function write(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
 }
 
-/** Mutable user settings (language, emergency contact). */
+/** Mutable user settings (language, transcription provider, emergency contact). */
 export const settings = Object.assign(
-  { lang: config.defaultLang, emergencyContact: null },
+  {
+    lang: config.defaultLang,
+    transcriptionProvider: config.transcriptionProvider,
+    emergencyContact: null,
+  },
   read('disha:settings', {})
 );
 

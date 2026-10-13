@@ -33,6 +33,12 @@ export const config = {
   googleMapsApiKey: injected.GOOGLE_MAPS_API_KEY || '',
   openWeatherApiKey: injected.OPENWEATHER_API_KEY || '',
 
+  // --- transcription ---
+  wisprApiKey: injected.WISPR_API_KEY || '',
+  wisprApiUrl: injected.WISPR_API_URL || 'https://api.wisprflow.ai',
+  transcriptionProvider: injected.TRANSCRIPTION_PROVIDER === 'wispr' ? 'wispr' : 'webspeech',
+  wisprMock: String(injected.WISPR_MOCK).toLowerCase() === 'true',
+
   // --- tuning ---
   defaultLang: injected.DEFAULT_LANG || 'en-IN',
   nearbyRadiusM: parseInt(injected.NEARBY_RADIUS_M || '1500', 10),

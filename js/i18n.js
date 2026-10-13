@@ -29,7 +29,9 @@ export const STRINGS = {
     langName: 'English',
     notUnderstood: 'I didn\'t catch that. Try "where am I", "take me home", or "what\'s near me".',
     stopped: 'Stopped.',
-    noSR: "Voice input isn't supported in this browser — the buttons below do everything by tap."
+    noSR: "Voice input isn't supported in this browser — the buttons below do everything by tap.",
+    wisprEnabled: 'Wispr transcription mode enabled.',
+    browserEnabled: 'Browser transcription mode enabled.',
   },
   'hi-IN': {
     listening: 'सुन रही हूँ… बोलिए।',
@@ -60,7 +62,9 @@ export const STRINGS = {
     langName: 'हिंदी',
     notUnderstood: '"मैं कहाँ हूँ", "घर ले चलो", या "आसपास क्या है" कहकर देखें।',
     stopped: 'रुक गई।',
-    noSR: 'इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है — नीचे दिए बटन टैप से सब कुछ होता है।'
+    noSR: 'इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है — नीचे दिए बटन टैप से सब कुछ होता है।',
+    wisprEnabled: 'विस्पर ट्रांसक्रिप्शन मोड चालू है।',
+    browserEnabled: 'ब्राउज़र ट्रांसक्रिप्शन मोड चालू है।'
   }
 };
 
