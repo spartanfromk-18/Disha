@@ -102,6 +102,11 @@ def health() -> dict[str, bool]:
     return {"ok": True, "key_configured": bool(_key())}
 
 
+@app.get("/")
+def root() -> dict[str, bool]:
+    return health()
+
+
 @app.post("/stt")
 async def stt(audio: UploadFile = File(...)) -> dict[str, str]:
     wav = _convert_to_wav(await audio.read())
