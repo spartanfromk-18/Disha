@@ -4,7 +4,7 @@ import { tr } from './i18n.js';
 
 const SpeechRecognitionApi = typeof window !== 'undefined' &&
   (window.SpeechRecognition || window.webkitSpeechRecognition);
-const proxyUrl = () => window.DISHA_NIM_URL || 'http://localhost:8000';
+const proxyUrl = () => window.DISHA_NIM_URL || 'https://disha-eight-henna.vercel.app';
 let listening = false;
 let onResultCb = null;
 let stopCapture = null;
