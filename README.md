@@ -13,9 +13,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0-FFD60A?style=flat-square" alt="version">
+  <img src="https://img.shields.io/badge/version-2.0-FFD60A?style=flat-square" alt="version">
   <img src="https://img.shields.io/badge/English-हिंदी-4A90D9?style=flat-square" alt="English and Hindi">
-  <img src="https://img.shields.io/badge/backend-none-2ECC71?style=flat-square" alt="no backend">
+  <img src="https://img.shields.io/badge/backend-NVIDIA_NIM_proxy-2ECC71?style=flat-square" alt="NVIDIA NIM proxy">
   <img src="https://img.shields.io/badge/PWA-ready-9B59B6?style=flat-square" alt="PWA ready">
   <img src="https://img.shields.io/badge/built_with-Wispr_Flow-FF6B6B?style=flat-square" alt="built with Wispr Flow">
 </p>
@@ -200,8 +200,8 @@ disha/
 │   ├── i18n.js           # English + Hindi response templates
 │   ├── store.js          # localStorage: settings, favorites, breadcrumb
 │   ├── ui.js             # DOM refs, status/transcript/response rendering
-│   ├── speech.js         # voice output (speech synthesis)
-│   ├── transcription.js  # Web Speech default + optional Wispr provider/fallback
+│   ├── speech.js         # NVIDIA NIM voice with browser fallback
+│   ├── transcription.js  # legacy Web Speech/Wispr provider
 │   ├── geo.js            # geolocation + Nominatim geocoding
 │   ├── places.js         # "what's near me" via Overpass API
 │   ├── nav.js            # deep links: Google Maps + WhatsApp
@@ -217,6 +217,23 @@ disha/
 </details>
 
 ---
+
+## NVIDIA NIM voice proxy
+
+Version 2.0 adds a local FastAPI proxy for NVIDIA Parakeet speech recognition
+and Magpie speech synthesis. The NVIDIA key remains server-side in
+`server/.env`; it is never sent to the browser.
+
+```bash
+cp server/.env.example server/.env
+# set NVIDIA_API_KEY in server/.env
+python3 -m venv server/.venv
+server/.venv/bin/pip install -r server/requirements.txt
+python server/nim_proxy.py
+```
+
+The PWA uses `http://localhost:8000` by default and automatically falls back
+to the browser's built-in speech APIs when the proxy is unavailable.
 
 ## 🔑 Environment & API keys
 

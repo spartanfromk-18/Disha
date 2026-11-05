@@ -1,5 +1,8 @@
 # ---- secrets: never commit ----
 .env
+server/.env
+server/.venv/
+server/__pycache__/
 js/env.generated.js
 
 # ---- OS ----
