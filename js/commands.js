@@ -23,7 +23,6 @@ function done() {
 
 async function handle(raw) {
   const text = raw.toLowerCase().trim().replace(/[!?.,]+$/g, '');
-  speak(tr(settings.lang, 'working')); // UI_UX: working state is announced aloud
   setStatus(tr(settings.lang, 'working'));
   setTalkState('working');
 
@@ -111,9 +110,19 @@ async function handle(raw) {
     }
 
     /* Place lookups such as "where is the nearest hospital?" */
-    m = text.match(/^(?:where is|locate|find|search for|show me)\s+(?:the\s+)?(.+)$/);
+    m = text.match(/^(?:where is|locate|find|search for|show me|i need|i want)\s+(?:a|an|the\s+)?(.+)$/);
     if (m && !/\b(?:my location|near me|nearby|around me)\b/.test(m[1])) {
       const place = await searchPlace(m[1].replace(/\?+$/, '').trim());
+      if (!place) { say('placeNotFound', m[1]); return; }
+      openUrl(mapsDir(place.lat, place.lon));
+      say('openingNav', m[1]);
+      return;
+    }
+
+    /* Requests phrased as a need: "I need directions to..." or "get me a taxi". */
+    m = text.match(/^(?:i need directions? to|i need to get to|help me get to|please help me find)\s+(.+)$/);
+    if (m) {
+      const place = await searchPlace(m[1]);
       if (!place) { say('placeNotFound', m[1]); return; }
       openUrl(mapsDir(place.lat, place.lon));
       say('openingNav', m[1]);
@@ -198,7 +207,7 @@ async function handle(raw) {
       return;
     }
 
-    say('notUnderstood');
+    say('generalHelp');
   } catch (err) {
     if (err && err.code === 1) say('needLocation');
     else say('servicesDown');

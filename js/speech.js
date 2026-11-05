@@ -8,6 +8,8 @@ const proxyUrl = () => window.DISHA_NIM_URL || 'https://disha-eight-henna.vercel
 let listening = false;
 let onResultCb = null;
 let stopCapture = null;
+let activeAudio = null;
+let activeObjectUrl = null;
 
 export function pickVoice() {
   try {
@@ -27,9 +29,17 @@ async function speakWithNim(text) {
     body: JSON.stringify({ text, lang: settings.lang }),
   });
   if (!response.ok) throw new Error(`NIM TTS failed (${response.status})`);
-  const audio = new Audio(URL.createObjectURL(await response.blob()));
+  const objectUrl = URL.createObjectURL(await response.blob());
+  activeObjectUrl = objectUrl;
+  const audio = new Audio(objectUrl);
+  activeAudio = audio;
   await new Promise((resolve, reject) => {
-    audio.onended = resolve;
+    audio.onended = () => {
+      if (activeAudio === audio) activeAudio = null;
+      URL.revokeObjectURL(objectUrl);
+      if (activeObjectUrl === objectUrl) activeObjectUrl = null;
+      resolve();
+    };
     audio.onerror = () => reject(new Error('NIM audio playback failed'));
     audio.play().catch(reject);
   });
@@ -37,6 +47,16 @@ async function speakWithNim(text) {
 
 export function speak(text) {
   showSaid(text);
+  if (activeAudio) {
+    activeAudio.pause();
+    activeAudio.src = '';
+    activeAudio = null;
+  }
+  if (activeObjectUrl) {
+    URL.revokeObjectURL(activeObjectUrl);
+    activeObjectUrl = null;
+  }
+  try { window.speechSynthesis?.cancel(); } catch {}
   speakWithNim(text).catch(() => {
     try {
       const synth = window.speechSynthesis;
