@@ -5,6 +5,7 @@ import { tr } from './i18n.js';
 const SpeechRecognitionApi = typeof window !== 'undefined' &&
   (window.SpeechRecognition || window.webkitSpeechRecognition);
 const proxyUrl = () => window.DISHA_NIM_URL || 'https://disha-eight-henna.vercel.app';
+const REQUEST_TIMEOUT_MS = 15000;
 let listening = false;
 let onResultCb = null;
 let stopCapture = null;
@@ -23,11 +24,19 @@ export function pickVoice() {
 }
 
 async function speakWithNim(text) {
-  const response = await fetch(`${proxyUrl()}/tts`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, lang: settings.lang }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let response;
+  try {
+    response = await fetch(`${proxyUrl()}/tts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, lang: settings.lang }),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
   if (!response.ok) throw new Error(`NIM TTS failed (${response.status})`);
   const objectUrl = URL.createObjectURL(await response.blob());
   activeObjectUrl = objectUrl;
@@ -139,7 +148,18 @@ async function nimTranscribe() {
   const audio = await recordAudio();
   const form = new FormData();
   form.append('audio', audio, 'recording.webm');
-  const response = await fetch(`${proxyUrl()}/stt`, { method: 'POST', body: form });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let response;
+  try {
+    response = await fetch(`${proxyUrl()}/stt`, {
+      method: 'POST',
+      body: form,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
   if (!response.ok) throw new Error(`NIM STT failed (${response.status})`);
   const result = await response.json();
   if (!result.transcript?.trim()) throw new Error('NIM returned no transcript');

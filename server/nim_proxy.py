@@ -3,29 +3,60 @@ import os
 import shutil
 import subprocess
 import tempfile
+import time
 import wave
 from pathlib import Path
 
 import riva.client
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
+from starlette.middleware.base import BaseHTTPMiddleware
 
 load_dotenv(Path(__file__).with_name(".env"))
 
 NIM_URI = "grpc.nvcf.nvidia.com:443"
 ASR_FUNCTION_ID = "71203149-d3b7-4460-8231-1be2543a1fca"
 TTS_FUNCTION_ID = "877104f7-e885-42b9-8de8-f6e4c6303969"
+MAX_AUDIO_BYTES = 10 * 1024 * 1024
+MAX_TTS_CHARACTERS = 1000
+
+
+def _allowed_origins() -> list[str]:
+    configured = os.getenv("DISHA_ALLOWED_ORIGINS", "").strip()
+    if configured:
+        return [origin.strip().rstrip("/") for origin in configured.split(",") if origin.strip()]
+    return [
+        "https://globaldisha.vercel.app",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ]
+
 
 app = FastAPI(title="Disha NVIDIA NIM proxy")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allowed_origins(),
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class RequestGuardMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > MAX_AUDIO_BYTES:
+            return JSONResponse(status_code=413, content={"detail": "request body is too large"})
+        started = time.perf_counter()
+        response = await call_next(request)
+        response.headers["X-Request-ID"] = request.headers.get("x-request-id", os.urandom(8).hex())
+        response.headers["X-Response-Time-Ms"] = str(round((time.perf_counter() - started) * 1000, 2))
+        return response
+
+
+app.add_middleware(RequestGuardMiddleware)
 
 
 class TtsRequest(BaseModel):
@@ -109,7 +140,12 @@ def root() -> dict[str, bool]:
 
 @app.post("/stt")
 async def stt(audio: UploadFile = File(...)) -> dict[str, str]:
-    wav = _convert_to_wav(await audio.read())
+    raw_audio = await audio.read()
+    if not raw_audio:
+        raise HTTPException(status_code=400, detail="audio is required")
+    if len(raw_audio) > MAX_AUDIO_BYTES:
+        raise HTTPException(status_code=413, detail="audio file is too large")
+    wav = _convert_to_wav(raw_audio)
     try:
         config = riva.client.RecognitionConfig(
             encoding=riva.client.AudioEncoding.LINEAR_PCM,
@@ -144,6 +180,10 @@ async def stt(audio: UploadFile = File(...)) -> dict[str, str]:
 def tts(request: TtsRequest) -> Response:
     if not request.text.strip():
         raise HTTPException(status_code=400, detail="text is required")
+    if len(request.text) > MAX_TTS_CHARACTERS:
+        raise HTTPException(status_code=413, detail="text is too long")
+    if request.lang not in {"en-IN", "hi-IN"}:
+        raise HTTPException(status_code=400, detail="lang must be en-IN or hi-IN")
     voices = {
         "hi-IN": ("Magpie-Multilingual.HI-IN.Aria", "hi-IN"),
         "en-IN": ("Magpie-Multilingual.EN-US.Aria", "en-US"),

@@ -4,6 +4,8 @@ server/.env
 server/.venv/
 server/__pycache__/
 js/env.generated.js
+__pycache__/
+.pytest_cache/
 
 # ---- OS ----
 .DS_Store
