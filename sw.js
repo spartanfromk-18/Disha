@@ -1,4 +1,4 @@
-const CACHE = 'disha-shell-v3.0.3';
+const CACHE = 'disha-shell-v4.5.0';
 const SHELL = [
   './',
   './index.html',
