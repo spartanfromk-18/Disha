@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/styles.css">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -49,8 +50,26 @@
 
     <p class="hint" id="hint">Try: "where am I" · "remember home" · "take me home" · "what's near me" · "remember this spot" · "take me back" · "share my trip" · "help me"</p>
     <p class="note" id="srNote" hidden>Voice input isn't supported in this browser — the buttons above do everything by tap.</p>
+
+    <section class="map-card" aria-label="Map">
+      <div class="map-heading">
+        <div>
+          <div class="card-label">INDIA-FIRST MAP</div>
+          <p class="map-source">Global OpenStreetMap data · landmarks, transit and walking places</p>
+        </div>
+        <button id="locateBtn" class="map-action" type="button">Locate me</button>
+      </div>
+      <form id="mapSearch" class="map-search">
+        <label class="sr-only" for="mapQuery">Search globally</label>
+        <input id="mapQuery" type="search" placeholder="Search any place, landmark or station" autocomplete="off">
+        <button type="submit">Search</button>
+      </form>
+      <div id="map" class="map" role=" application" aria-label="Interactive OpenStreetMap"></div>
+      <p id="mapStatus" class="map-status" role="status"></p>
+    </section>
   </main>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -5,6 +5,7 @@ import { tr } from './i18n.js';
 import { speak } from './speech.js';
 import { toggleListen, stopListen, onSpeechResult, speechSupported } from './speech.js';
 import { onHeard } from './commands.js';
+import { initMap } from './map.js';
 
 el.talkBtn.addEventListener('click', toggleListen);
 
@@ -41,3 +42,8 @@ try {
 
 setLang(settings.lang);
 refreshLabels();
+initMap();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}

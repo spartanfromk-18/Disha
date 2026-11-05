@@ -244,6 +244,76 @@ body::before {
   margin: 6px 0 0;
 }
 
+.map-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 22px 18px 18px;
+}
+
+.map-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.map-source, .map-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.map-action, .map-search button {
+  min-height: 56px;
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  padding: 0 14px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.map-search {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 12px;
+}
+
+.map-search input {
+  min-width: 0;
+  flex: 1;
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 0 14px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--fg);
+  font: inherit;
+  font-size: 18px;
+}
+
+.map {
+  height: 300px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #d8d2c4;
+}
+
+.map-status { margin-top: 10px; min-height: 24px; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .secure-warn {
   background: rgba(255, 69, 58, 0.12);
   border: 1px solid rgba(255, 69, 58, 0.5);

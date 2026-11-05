@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.0-FFD60A?style=flat-square" alt="version">
+  <img src="https://img.shields.io/badge/version-3.0.3-FFD60A?style=flat-square" alt="version">
   <img src="https://img.shields.io/badge/English-हिंदी-4A90D9?style=flat-square" alt="English and Hindi">
   <img src="https://img.shields.io/badge/backend-NVIDIA_NIM_proxy-2ECC71?style=flat-square" alt="NVIDIA NIM proxy">
   <img src="https://img.shields.io/badge/PWA-ready-9B59B6?style=flat-square" alt="PWA ready">
@@ -220,7 +220,7 @@ disha/
 
 ## NVIDIA NIM voice proxy
 
-Version 2.0 adds a local FastAPI proxy for NVIDIA Parakeet speech recognition
+Version 3.0.3 adds an India-first OpenStreetMap experience alongside the local FastAPI proxy for NVIDIA Parakeet speech recognition
 and Magpie speech synthesis. The NVIDIA key remains server-side in
 `server/.env`; it is never sent to the browser.
 
