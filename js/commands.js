@@ -22,7 +22,7 @@ function done() {
 }
 
 async function handle(raw) {
-  const text = raw.toLowerCase().trim();
+  const text = raw.toLowerCase().trim().replace(/[!?.,]+$/g, '');
   speak(tr(settings.lang, 'working')); // UI_UX: working state is announced aloud
   setStatus(tr(settings.lang, 'working'));
   setTalkState('working');
@@ -53,6 +53,12 @@ async function handle(raw) {
       return;
     }
 
+    /* conversational greetings */
+    if (/^(hi|hello|hey|hey there|good morning|good afternoon|good evening|hey,? what's up|how are you|what can you do|नमस्ते|हैलो|हाय)(?: there| disha)?$/.test(text)) {
+      say('greeting');
+      return;
+    }
+
     /* emergency contact */
     m = text.match(/my emergency (?:number|contact) is ([\d+\s-]{6,})/);
     if (m) {
@@ -63,7 +69,7 @@ async function handle(raw) {
     }
 
     /* where am i */
-    if (/where am i|मैं कहाँ|मेरी लोकेशन/.test(text)) {
+    if (/where am i|where are we|what(?:'s| is) my location|show my location|find my location|my location|मैं कहाँ|मेरी लोकेशन/.test(text)) {
       const p = await getPos();
       const lat = p.coords.latitude, lon = p.coords.longitude;
       let addr = null;
@@ -94,10 +100,20 @@ async function handle(raw) {
       return;
     }
 
-    /* take me to <place> */
-    m = text.match(/^take me to (.+)$/);
+    /* Natural navigation requests: "go to", "directions to", "how do I get to". */
+    m = text.match(/^(?:take me to|go to|navigate to|directions? to|how do i get to|how can i get to|i want to go to|can you take me to|please take me to)\s+(.+)$/);
     if (m) {
       const place = await searchPlace(m[1]);
+      if (!place) { say('placeNotFound', m[1]); return; }
+      openUrl(mapsDir(place.lat, place.lon));
+      say('openingNav', m[1]);
+      return;
+    }
+
+    /* Place lookups such as "where is the nearest hospital?" */
+    m = text.match(/^(?:where is|locate|find|search for|show me)\s+(?:the\s+)?(.+)$/);
+    if (m && !/\b(?:my location|near me|nearby|around me)\b/.test(m[1])) {
+      const place = await searchPlace(m[1].replace(/\?+$/, '').trim());
       if (!place) { say('placeNotFound', m[1]); return; }
       openUrl(mapsDir(place.lat, place.lon));
       say('openingNav', m[1]);
@@ -148,8 +164,8 @@ async function handle(raw) {
       return;
     }
 
-    /* what's near me — ARCHITECTURE §6: degrade to Maps-search suggestion */
-    if (/what'?s near me|nearby|आसपास/.test(text)) {
+    /* Nearby requests, including "find a pharmacy around me". */
+    if (/what'?s near me|what is near me|nearby|near me|around me|closest|nearest|आसपास/.test(text)) {
       const p = await getPos();
       let items = null;
       try { items = await nearby(p.coords.latitude, p.coords.longitude); }
