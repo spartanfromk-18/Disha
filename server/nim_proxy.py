@@ -1,5 +1,6 @@
 import io
 import os
+import shutil
 import subprocess
 import tempfile
 import wave
@@ -60,7 +61,21 @@ def _wav_bytes(pcm: bytes, sample_rate: int) -> bytes:
     return output.getvalue()
 
 
+def _ffmpeg_exe() -> str | None:
+    found = shutil.which("ffmpeg")
+    if found:
+        return found
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        return None
+
+
 def _convert_to_wav(audio: bytes) -> bytes:
+    ffmpeg = _ffmpeg_exe()
+    if ffmpeg is None:
+        raise HTTPException(status_code=500, detail="ffmpeg is not installed")
     with tempfile.TemporaryDirectory() as directory:
         input_path = Path(directory) / "input"
         output_path = Path(directory) / "output.wav"
@@ -68,7 +83,7 @@ def _convert_to_wav(audio: bytes) -> bytes:
         try:
             subprocess.run(
                 [
-                    "ffmpeg", "-y", "-i", str(input_path), "-ac", "1",
+                    ffmpeg, "-y", "-i", str(input_path), "-ac", "1",
                     "-ar", "16000", "-sample_fmt", "s16", str(output_path),
                 ],
                 check=True,

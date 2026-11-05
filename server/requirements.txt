@@ -3,3 +3,4 @@ uvicorn[standard]
 python-multipart
 python-dotenv
 nvidia-riva-client
+imageio-ffmpeg
